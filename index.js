@@ -166,28 +166,32 @@ app.post('/submitUser', async (req,res) => {
         return;
     }
 
-	const schema = Joi.object(
-		{   
+    const schema = Joi.object(
+        {   
             email: Joi.string().email().required(),
-			username: Joi.string().alphanum().max(20).required(),
-			password: Joi.string().max(20).required()
-		});
-	
-	const validationResult = schema.validate({email,username, password});
-	if (validationResult.error != null) {
-	   console.log(validationResult.error);
-	   res.redirect("/createUser");
-	   return;
-   }
+            username: Joi.string().alphanum().max(20).required(),
+            password: Joi.string().max(20).required()
+        });
+
+    const validationResult = schema.validate({email,username, password});
+    if (validationResult.error != null) {
+       console.log(validationResult.error);
+       res.redirect("/createUser");
+       return;
+    }
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
-	
-	await userCollection.insertOne({email: email, username: username, password: hashedPassword});
-	console.log("Inserted user");
 
-    var html = 'successfully created user <a href="/login">login</a>';
-    res.send(html);
+    await userCollection.insertOne({email: email, username: username, password: hashedPassword});
+    console.log("Inserted user");
+
+    // Log the user in and redirect them to the members page
+    req.session.authenticated = true;
+    req.session.email = email;
+    req.session.cookie.maxAge = expireTime;
+    res.redirect('/members');
 });
+
 
 
 app.post('/loggingin', async (req,res) => {
