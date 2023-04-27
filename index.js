@@ -269,26 +269,41 @@ app.get('/logout', (req,res) => {
 });
 
 app.get('/members', async (req,res) => {
-    if (req.session.authenticated) {
-      try {
-        const result = await userCollection.find({email: req.session.email}).project({username: 1}).toArray();
-        const photoId = Math.floor(Math.random() * 2) + 1; // generate a random number between 1 and 2
-        var html = `
-          <h2>Hello, ${result[0].username}.</h2>
-          <div>${photoId == 1 ? 'Java' : 'C'}: <img src='/${photoId == 1 ? 'java' : 'c'}.jpg' style='width:250px;'></div>
-          <br></br>
-          <button onclick="window.location.href='/logout'">Log out</button>`;
-        res.send(html);
-        return;
-      } catch (error) {
-        console.log(error);
-        res.redirect('/login');
+  if (req.session.authenticated) {
+    try {
+      const result = await userCollection.find({email: req.session.email}).project({username: 1}).toArray();
+      const photoId = Math.floor(Math.random() * 3) + 1; // generate a random number between 1 to 3
+      var html = `
+        <h2>Hello, ${result[0].username}.</h2>
+        `;
+      if (photoId === 1) {
+        html += `
+          <div>Java: <img src='/java.jpg' style='width:250px;'></div>
+          `;
+      } else if (photoId === 2) {
+        html += `
+          <div>C: <img src='/c.jpg' style='width:250px;'></div>
+          `;
+      } else if (photoId === 3) {
+        html += `
+          <div>JavaScript: <img src='/javascript.jpg' style='width:250px;'></div>
+          `;
       }
-    } else  {
-        res.redirect('/login');
-        return;
+      html += `
+        <br></br>
+        <button onclick="window.location.href='/logout'">Log out</button>
+        `;
+      res.send(html);
+      return;
+    } catch (error) {
+      console.log(error);
+      res.redirect('/login');
     }
-  });
+  } else  {
+      res.redirect('/login');
+      return;
+  }
+});
 
 app.use(express.static(__dirname + "/public"));
 
