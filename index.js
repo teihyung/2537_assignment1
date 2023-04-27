@@ -229,7 +229,7 @@ app.post('/loggingin', async (req,res) => {
         req.session.email = email;
         req.session.cookie.maxAge = expireTime;
 
-        res.redirect('/loggedIn');
+        res.redirect('/members');
         return;
     }
     else {
@@ -241,23 +241,23 @@ app.post('/loggingin', async (req,res) => {
     }
 });
 
-app.get('/loggedin', async (req,res) => {
-    if (!req.session.authenticated) {
-        return res.redirect('/login');
-    }
-    try {
-      const result = await userCollection.find({email: req.session.email}).project({username: 1}).toArray();
-      var html = `
-      <h2>Hello, ${result[0].username}.</h2>
-      <button onclick="window.location.href='/members'">go to members page</button>
-      <br></br>
-      <button onclick="window.location.href='/logout'">Log out</button>`;
-      res.send(html);
-    } catch (error) {
-      console.log(error);
-      res.redirect('/login');
-    }
-  });
+// app.get('/loggedin', async (req,res) => {
+//     if (!req.session.authenticated) {
+//         return res.redirect('/login');
+//     }
+//     try {
+//       const result = await userCollection.find({email: req.session.email}).project({username: 1}).toArray();
+//       var html = `
+//       <h2>Hello, ${result[0].username}.</h2>
+//       <button onclick="window.location.href='/members'">go to members page</button>
+//       <br></br>
+//       <button onclick="window.location.href='/logout'">Log out</button>`;
+//       res.send(html);
+//     } catch (error) {
+//       console.log(error);
+//       res.redirect('/login');
+//     }
+//   });
 
 app.get('/logout', (req,res) => {
 	req.session.destroy();
